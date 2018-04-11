@@ -141,7 +141,6 @@ for loopY in range(ySize):
 		gameBoard[loopY][loopX][0] = blockType
 
 getDir(entrancePos) #Generates Random Path
-# printBoard()
 
 # Making art for the game after the path is generated
 for loopY in range(0,ySize):
