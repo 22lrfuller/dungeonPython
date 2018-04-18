@@ -7,6 +7,7 @@ pygame.init()
 
 global white, grey, red, yellow, green, blue
 global randDoor, randBlock
+global animCount, countVar, curFrame
 
 # Board size constants
 xSize = 12
@@ -15,24 +16,33 @@ ySize = 8
 xMax = xSize - 1
 yMax = ySize - 1
 # Non-Color Variables
-displayWidth = xSize*100
-displayHeight = (ySize+1)*100
 xBox = 0
 yBox = 0
+diamonds = 0
+animCount = 0
+curFrame = 0
 scene = 'startPage'
-gameOver = False
+playerDir = 'front'
 imageType = None
+countVar = False
+gameOver = False
 firstTime = True
-randBlock = randNum(1,10)
 gameBoard = []
 entrancePos = []
 posPath = []
+displayWidth = xSize*100
+displayHeight = (ySize+1)*100
+randBlock = randNum(1,10)
 
 # Images
 startScreen = pygame.transform.scale(pygame.image.load('gameArt/startScreen.png'), (1000,1000))
-playerImg = pygame.transform.scale(pygame.image.load('gameArt/pixelChar.png'), (75, 75))
 invBG = pygame.transform.scale(pygame.image.load('gameArt/invBG.png'), (1200,100))
 invObj = pygame.transform.scale(pygame.image.load('gameArt/invObj.png'), (75,75))
+
+charDict = {'front':pygame.transform.scale(pygame.image.load('gameArt/charFront.png'), (75, 75)),
+'back':pygame.transform.scale(pygame.image.load('gameArt/charBack.png'), (75, 75)),
+'left':pygame.transform.scale(pygame.image.load('gameArt/charLeft.png'), (75, 75)),
+'right':pygame.transform.scale(pygame.image.load('gameArt/charRight.png'), (75, 75))}
 
 path = pygame.transform.scale(pygame.image.load('gameArt/path.png'), (100,100))
 crackedPath = pygame.transform.scale(pygame.image.load('gameArt/cracked.path.png'), (100,100))
@@ -44,6 +54,9 @@ wall = pygame.transform.scale(pygame.image.load('gameArt/wall.png'), (100,100))
 crackedWall = pygame.transform.scale(pygame.image.load('gameArt/cracked.wall.png'), (100,100))
 door = pygame.transform.scale(pygame.image.load('gameArt/door.png'), (100,100))
 flowerDoor = pygame.transform.scale(pygame.image.load('gameArt/flower.door.png'), (100,100))
+
+chestSS = pygame.transform.scale(pygame.image.load('gameArt/cBlockSS.png'), (100,100))
+flowerChestSS = pygame.transform.scale(pygame.image.load('gameArt/flower.cBlockSS.png'), (100,100))
 
 # Colors
 white = (255, 255, 255)
@@ -114,26 +127,45 @@ def getDir(entrancePos): # Creating the random path
 
 def keyUp(event, funcX, funcY): # Start Movement on Key Down
 	if(event.key == K_UP or event.key == K_w):
+		playerDir = 'back'
 		if(funcY-1 >= 0 and funcY-1 <= yMax):
 			if(gameBoard[funcY-1][funcX][0] != 'wall' and gameBoard[funcY-1][funcX][0] != 'border'):
 				funcY -= 1
 	elif(event.key == K_DOWN or event.key == K_s):
+		playerDir = 'front'
 		if(funcY+1 >= 0 and funcY+1 <= yMax):
 			if(gameBoard[funcY+1][funcX][0] != 'wall' and gameBoard[funcY+1][funcX][0] != 'border'):
 				funcY += 1
 	elif(event.key == K_LEFT or event.key == K_a):
+		playerDir = 'left'
 		if(funcX-1 >= 0 and funcX-1 <= xMax):
 			if(gameBoard[funcY][funcX-1][0] != 'wall' and gameBoard[funcY][funcX-1][0] != 'border'):
 				funcX -= 1
 	elif(event.key == K_RIGHT or event.key == K_d):
+		playerDir = 'right'
 		if(funcX+1 >= 0 and funcX+1 <= xMax):
 			if(gameBoard[funcY][funcX+1][0] != 'wall' and gameBoard[funcY][funcX+1][0] != 'border'):
 				funcX += 1
-	return funcX, funcY
+	return playerDir, funcX, funcY
 
-def checkArea(xBox,yBox):
-	if(gameBoard[yBox][xBox][0] == 'cBlock'):
-		pass
+def checkForward(playerDir,xBox,yBox):
+	if(playerDir == 'front' and gameBoard[yBox-1][xBox][0] == 'cBlock'): openChest(yBox-1,xBox)
+	if(playerDir == 'back' and gameBoard[yBox+1][xBox][0] == 'cBlock'): openChest(yBox+1,xBox)
+	if(playerDir == 'left' and gameBoard[yBox][xBox-1][0] == 'cBlock'): openChest(yBox,xBox-1)
+	if(playerDir == 'right' and gameBoard[yBox][xBox+1][0] == 'cBlock'): openChest(yBox,xBox+1)
+
+def openChest(yOpen,xOpen):
+	# Link: http://programarcadegames.com/python_examples/en/sprite_sheets/
+	# Link: https://www.pygame.org/docs/ref/surface.html#pygame.Surface.subsurface
+	if(animCount == 10):
+		if(gameBoard[yOpen][xOpen][1] == "cBlock"):
+
+		else:
+	countVar = True
+
+	diamonds += 1 # TODO: Add dimaonds the GUI
+	if(curFrame == 10):
+		gameBoard[yOpen][xOpen][0] = 'path'
 
 # Creating the game board in a row-major format
 # Everything will be referenced [y][x] in the array
@@ -143,7 +175,7 @@ for loopY in range(ySize):
 	for loopX in range(xSize):
 		gameBoard[loopY][loopX][0] = getBlockType(loopX,loopY,'other')
 
-getDir(entrancePos) #Generates Random Path
+getDir(entrancePos) # Generates Random Path
 
 # Making art for the game after the path is generated
 for loopY in range(0,ySize):
@@ -171,9 +203,9 @@ while(gameOver == False):
 				scene = 'game'
 		if(event.type == pygame.KEYUP and scene == 'game'):
 			if(event.key == K_UP or event.key == K_w or event.key == K_DOWN or event.key == K_s or event.key == K_LEFT or event.key == K_a or event.key == K_RIGHT or event.key == K_d):
-				xBox, yBox = keyUp(event, xBox, yBox)
+				playerDir, xBox, yBox = keyUp(event, xBox, yBox)
 			elif(event.key == K_SPACE):
-				checkArea(xBox,yBox)
+				checkArea(playerDir,xBox,yBox)
 		if(event.type == pygame.QUIT):
 			gameOver = True
 	screen.fill(white)
@@ -189,7 +221,9 @@ while(gameOver == False):
 		for x in range(10): # Creating boxes in the inventory
 			if(x != 0 or x != xMax-1):
 				screen.blit(invObj,((x+1)*110,812))
-		screen.blit(playerImg,(xBox*100+12, yBox*100+12))
+		screen.blit(charDict[playerDir],(xBox*100+12, yBox*100+12))
+	if(countVar == True):
+		animCount += 1
 	pygame.display.update()
 	clock.tick(60)
 endGame()
