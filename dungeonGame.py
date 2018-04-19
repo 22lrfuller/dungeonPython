@@ -71,7 +71,7 @@ def getBlockType(blockX, blockY, blockKind): # Defining blocks in the grid
 	if(blockKind == 'origPath'):
 		randBlock = randNum(1,20) # 95% chance for path, 5% for chestBlock
 		if(randBlock <= 19): return 'path'
-		return 'chestBlock'
+		return 'cBlock'
 	if(blockKind == 'other'):
 		if(blockX == 0 or blockX == xMax or blockY == 0 or blockY == yMax):
 			if(blockY == yMax and randDoor == blockX):
@@ -81,7 +81,7 @@ def getBlockType(blockX, blockY, blockKind): # Defining blocks in the grid
 		randBlock = randNum(1,40)
 		if(randBlock <= 20): return 'path'
 		if(randBlock > 20 and randBlock < 39): return 'wall'
-		return 'chestBlock'
+		return 'cBlock'
 
 def getArt(blockKind): # Gets the Random Art for that type
 	if(blockKind == 'path'):
@@ -90,7 +90,7 @@ def getArt(blockKind): # Gets the Random Art for that type
 		if(randomVar == 2): return 'cracked.path'
 		if(randomVar == 3): return 'flower.path'
 		if(randomVar == 4): return 'crackedFlower.path'
-	if(blockKind == 'chestBlock'):
+	if(blockKind == 'cBlock'):
 		randomVar = randNum(1,2)
 		if(randomVar == 1): return 'cBlock'
 		if(randomVar == 2): return 'flower.cBlock'
@@ -107,7 +107,6 @@ def getDir(entrancePos): # Creating the random path
 	global posPath
 	blockX = entrancePos[0]
 	blockY = entrancePos[1]
-	print(int(round(xSize/2.0)))
 	while(blockY-1 != 0):
 		randomVar = randNum(1,3)
 		if(randomVar == 1 and gameBoard[blockY][blockX-1][0] != 'border'): # Left
@@ -149,18 +148,20 @@ def keyUp(event, funcX, funcY): # Start Movement on Key Down
 	return playerDir, funcX, funcY
 
 def checkForward(playerDir,xBox,yBox):
-	if(playerDir == 'front' and gameBoard[yBox-1][xBox][0] == 'cBlock'): openChest(yBox-1,xBox)
-	if(playerDir == 'back' and gameBoard[yBox+1][xBox][0] == 'cBlock'): openChest(yBox+1,xBox)
+	if(playerDir == 'front' and gameBoard[yBox+1][xBox][0] == 'cBlock'): openChest(yBox+1,xBox)
+	if(playerDir == 'back' and gameBoard[yBox-1][xBox][0] == 'cBlock'): openChest(yBox-1,xBox)
 	if(playerDir == 'left' and gameBoard[yBox][xBox-1][0] == 'cBlock'): openChest(yBox,xBox-1)
 	if(playerDir == 'right' and gameBoard[yBox][xBox+1][0] == 'cBlock'): openChest(yBox,xBox+1)
 
 def openChest(yOpen,xOpen):
-	# Link: http://programarcadegames.com/python_examples/en/sprite_sheets/
-	# Link: https://www.pygame.org/docs/ref/surface.html#pygame.Surface.subsurface
+	global diamonds
+	frameObj = pygame.Surface([25, 25])
 	if(animCount == 10):
 		if(gameBoard[yOpen][xOpen][1] == "cBlock"):
-
-		else:
+			frameObj.blit(cBlockSS, (0, 0), (0, 25, 25, 25))
+		if(gameBoard[yOpen][xOpen][1] == "flower.cBlock"):
+			frameObj.blit(flowerCBlock, (0, 0), (0, 0, 25, 25))
+		screen.blit(pygame.transform.scale(frameObj,(100,100)))
 	countVar = True
 
 	diamonds += 1 # TODO: Add dimaonds the GUI
@@ -175,11 +176,7 @@ for loopY in range(ySize):
 	for loopX in range(xSize):
 		gameBoard[loopY][loopX][0] = getBlockType(loopX,loopY,'other')
 
-<<<<<<< HEAD
 getDir(entrancePos) # Generates Random Path
-=======
-getDir(entrancePos) #Generates Random Path
->>>>>>> 9e8538cae13a9cfd4e518b9911de8c3d5975d8ce
 
 # Making art for the game after the path is generated
 for loopY in range(0,ySize):
@@ -200,18 +197,23 @@ startButton = pygame.draw.rect(screen, blue,(400,700,200,100))
 
 # Main Game Loop
 while(gameOver == False):
+	# Pygame event checking
 	for event in pygame.event.get():
 		if(event.type == pygame.MOUSEBUTTONDOWN):
 			mousePos = pygame.mouse.get_pos()
 			if(startButton.collidepoint(mousePos)):
 				scene = 'game'
 		if(event.type == pygame.KEYUP and scene == 'game'):
-			if(event.key == K_UP or event.key == K_w or event.key == K_DOWN or event.key == K_s or event.key == K_LEFT or event.key == K_a or event.key == K_RIGHT or event.key == K_d):
+			if(event.key == K_UP or event.key == K_w or event.key == K_DOWN or event.key == K_s or
+			event.key == K_LEFT or event.key == K_a or event.key == K_RIGHT or event.key == K_d):
 				playerDir, xBox, yBox = keyUp(event, xBox, yBox)
 			elif(event.key == K_SPACE):
-				checkArea(playerDir,xBox,yBox)
+				print("something neat")
+				checkForward(playerDir,xBox,yBox)
 		if(event.type == pygame.QUIT):
 			gameOver = True
+
+	# Putting images on the screen
 	screen.fill(white)
 	if(scene == 'startPage'): # Prints the start screen
 		screen.blit(startScreen,(0,0))
@@ -226,6 +228,8 @@ while(gameOver == False):
 			if(x != 0 or x != xMax-1):
 				screen.blit(invObj,((x+1)*110,812))
 		screen.blit(charDict[playerDir],(xBox*100+12, yBox*100+12))
+
+	# Other
 	if(countVar == True):
 		animCount += 1
 	pygame.display.update()
