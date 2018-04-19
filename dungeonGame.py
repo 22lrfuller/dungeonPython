@@ -175,7 +175,11 @@ for loopY in range(ySize):
 	for loopX in range(xSize):
 		gameBoard[loopY][loopX][0] = getBlockType(loopX,loopY,'other')
 
+<<<<<<< HEAD
 getDir(entrancePos) # Generates Random Path
+=======
+getDir(entrancePos) #Generates Random Path
+>>>>>>> 9e8538cae13a9cfd4e518b9911de8c3d5975d8ce
 
 # Making art for the game after the path is generated
 for loopY in range(0,ySize):
