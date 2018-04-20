@@ -5,9 +5,8 @@ import pygame
 import sys
 pygame.init()
 
-global white, grey, red, yellow, green, blue
 global randDoor, randBlock
-global animCount, countVar, curFrame
+global curFrame
 
 # Board size constants
 xSize = 12
@@ -24,10 +23,10 @@ curFrame = 0
 scene = 'startPage'
 playerDir = 'front'
 imageType = None
-countVar = False
 gameOver = False
-firstTime = True
+animRun = False
 gameBoard = []
+chestPos = []
 entrancePos = []
 posPath = []
 displayWidth = xSize*100
@@ -55,8 +54,8 @@ crackedWall = pygame.transform.scale(pygame.image.load('gameArt/cracked.wall.png
 door = pygame.transform.scale(pygame.image.load('gameArt/door.png'), (100,100))
 flowerDoor = pygame.transform.scale(pygame.image.load('gameArt/flower.door.png'), (100,100))
 
-chestSS = pygame.transform.scale(pygame.image.load('gameArt/cBlockSS.png'), (100,100))
-flowerChestSS = pygame.transform.scale(pygame.image.load('gameArt/flower.cBlockSS.png'), (100,100))
+cBlockSS = pygame.transform.scale(pygame.image.load('gameArt/cBlockSS.png'), (100,100))
+flowerCBlockSS = pygame.transform.scale(pygame.image.load('gameArt/flower.cBlockSS.png'), (100,100))
 
 # Colors
 white = (255, 255, 255)
@@ -147,26 +146,37 @@ def keyUp(event, funcX, funcY): # Start Movement on Key Down
 				funcX += 1
 	return playerDir, funcX, funcY
 
-def checkForward(playerDir,xBox,yBox):
-	if(playerDir == 'front' and gameBoard[yBox+1][xBox][0] == 'cBlock'): openChest(yBox+1,xBox)
-	if(playerDir == 'back' and gameBoard[yBox-1][xBox][0] == 'cBlock'): openChest(yBox-1,xBox)
-	if(playerDir == 'left' and gameBoard[yBox][xBox-1][0] == 'cBlock'): openChest(yBox,xBox-1)
-	if(playerDir == 'right' and gameBoard[yBox][xBox+1][0] == 'cBlock'): openChest(yBox,xBox+1)
+def checkForward(playerDir,xBox,yBox,chestPos,animRun,diamonds):
+	if(playerDir == 'front' and gameBoard[yBox+1][xBox][0] == 'cBlock'):
+		chestPos = [yBox+1,xBox]
+		animRun,diamonds = True,diamonds+1
+	if(playerDir == 'back' and gameBoard[yBox-1][xBox][0] == 'cBlock'):
+		chestPos = [yBox-1,xBox]
+		animRun,diamonds = True,diamonds+1
+	if(playerDir == 'left' and gameBoard[yBox][xBox-1][0] == 'cBlock'):
+		chestPos = [yBox,xBox-1]
+		animRun,diamonds = True,diamonds+1
+	if(playerDir == 'right' and gameBoard[yBox][xBox+1][0] == 'cBlock'):
+		chestPos = [yBox,xBox+1]
+		animRun,diamonds = True,diamonds+1
+	return chestPos,animRun
 
-def openChest(yOpen,xOpen):
-	global diamonds
+def openChestAnim(chestPos,animCount,curFrame,yOpen,xOpen):
+	print("animation running")
 	frameObj = pygame.Surface([25, 25])
 	if(animCount == 10):
+		print("this ran")
 		if(gameBoard[yOpen][xOpen][1] == "cBlock"):
-			frameObj.blit(cBlockSS, (0, 0), (0, 25, 25, 25))
+			frameObj.blit(cBlockSS, (0, 25 * curFrame), (0, 0, 25, 25))
 		if(gameBoard[yOpen][xOpen][1] == "flower.cBlock"):
-			frameObj.blit(flowerCBlock, (0, 0), (0, 0, 25, 25))
-		screen.blit(pygame.transform.scale(frameObj,(100,100)))
-	countVar = True
-
-	diamonds += 1 # TODO: Add dimaonds the GUI
+			frameObj.blit(flowerCBlockSS, (0, 25 * curFrame), (0, 0, 25, 25))
+		screen.blit(pygame.transform.scale(frameObj,(100,100)),(xOpen*100,yOpen*100))
+		curFrame += 1
+		animCount = 0
 	if(curFrame == 10):
 		gameBoard[yOpen][xOpen][0] = 'path'
+		animRun = False
+	return animCount, curFrame
 
 # Creating the game board in a row-major format
 # Everything will be referenced [y][x] in the array
@@ -203,18 +213,18 @@ while(gameOver == False):
 			mousePos = pygame.mouse.get_pos()
 			if(startButton.collidepoint(mousePos)):
 				scene = 'game'
-		if(event.type == pygame.KEYUP and scene == 'game'):
+		if(event.type == pygame.KEYUP and scene == 'game' and animRun == False):
 			if(event.key == K_UP or event.key == K_w or event.key == K_DOWN or event.key == K_s or
 			event.key == K_LEFT or event.key == K_a or event.key == K_RIGHT or event.key == K_d):
 				playerDir, xBox, yBox = keyUp(event, xBox, yBox)
 			elif(event.key == K_SPACE):
-				print("something neat")
-				checkForward(playerDir,xBox,yBox)
+				chestPos,animRun = checkForward(playerDir,xBox,yBox,chestPos,animRun,diamonds)
 		if(event.type == pygame.QUIT):
 			gameOver = True
 
 	# Putting images on the screen
 	screen.fill(white)
+
 	if(scene == 'startPage'): # Prints the start screen
 		screen.blit(startScreen,(0,0))
 		startButton = pygame.draw.rect(screen, blue,(400,700,200,100))
@@ -229,8 +239,10 @@ while(gameOver == False):
 				screen.blit(invObj,((x+1)*110,812))
 		screen.blit(charDict[playerDir],(xBox*100+12, yBox*100+12))
 
+	if(animRun == True): animCount, curFrame = openChestAnim(chestPos,animCount,curFrame,chestPos[0],chestPos[1])
+
 	# Other
-	if(countVar == True):
+	if(animRun == True):
 		animCount += 1
 	pygame.display.update()
 	clock.tick(60)
