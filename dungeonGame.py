@@ -161,7 +161,7 @@ def checkForward(playerDir,xBox,yBox,chestPos,animRun,diamonds):
 		animRun,diamonds = True,diamonds+1
 	return chestPos,animRun
 
-def openChestAnim(chestPos,animCount,curFrame,yOpen,xOpen):
+def openChestAnim(animRun,chestPos,animCount,curFrame,yOpen,xOpen):
 	print("animation running")
 	frameObj = pygame.Surface([25, 25])
 	if(animCount == 10):
@@ -174,9 +174,12 @@ def openChestAnim(chestPos,animCount,curFrame,yOpen,xOpen):
 		curFrame += 1
 		animCount = 0
 	if(curFrame == 10):
+		print("curFrame == 10")
 		gameBoard[yOpen][xOpen][0] = 'path'
+		gameBoard[yOpen][xOpen][1] = getArt('path')
+		curFrame = 0
 		animRun = False
-	return animCount, curFrame
+	return animCount, curFrame, animRun
 
 # Creating the game board in a row-major format
 # Everything will be referenced [y][x] in the array
@@ -239,7 +242,7 @@ while(gameOver == False):
 				screen.blit(invObj,((x+1)*110,812))
 		screen.blit(charDict[playerDir],(xBox*100+12, yBox*100+12))
 
-	if(animRun == True): animCount, curFrame = openChestAnim(chestPos,animCount,curFrame,chestPos[0],chestPos[1])
+	if(animRun == True): animCount, curFrame, animRun = openChestAnim(animRun,chestPos,animCount,curFrame,chestPos[0],chestPos[1])
 
 	# Other
 	if(animRun == True):
