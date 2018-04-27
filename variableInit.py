@@ -70,14 +70,14 @@ charDict = {
 
 # Number images
 numberImg = {
-'zero':pygame.transform.scale(pygame.image.load('gameArt/numbers/zero.png'),(75,75)),
-'one':pygame.transform.scale(pygame.image.load('gameArt/numbers/one.png'),(75,75)),
-'two':pygame.transform.scale(pygame.image.load('gameArt/numbers/two.png'),(75,75)),
-'three':pygame.transform.scale(pygame.image.load('gameArt/numbers/three.png'),(75,75)),
-'four':pygame.transform.scale(pygame.image.load('gameArt/numbers/four.png'),(75,75)),
-'five':pygame.transform.scale(pygame.image.load('gameArt/numbers/five.png'),(75,75)),
-'six':pygame.transform.scale(pygame.image.load('gameArt/numbers/six.png'),(75,75)),
-'seven':pygame.transform.scale(pygame.image.load('gameArt/numbers/seven.png'),(75,75)),
-'eight':pygame.transform.scale(pygame.image.load('gameArt/numbers/eight.png'),(75,75)),
-'nine':pygame.transform.scale(pygame.image.load('gameArt/numbers/nine.png'),(75,75))
+'zero':pygame.transform.scale(pygame.image.load('numbers/zero.png'),(75,75)),
+'one':pygame.transform.scale(pygame.image.load('numbers/one.png'),(75,75)),
+'two':pygame.transform.scale(pygame.image.load('numbers/two.png'),(75,75)),
+'three':pygame.transform.scale(pygame.image.load('numbers/three.png'),(75,75)),
+'four':pygame.transform.scale(pygame.image.load('numbers/four.png'),(75,75)),
+'five':pygame.transform.scale(pygame.image.load('numbers/five.png'),(75,75)),
+'six':pygame.transform.scale(pygame.image.load('numbers/six.png'),(75,75)),
+'seven':pygame.transform.scale(pygame.image.load('numbers/seven.png'),(75,75)),
+'eight':pygame.transform.scale(pygame.image.load('numbers/eight.png'),(75,75)),
+'nine':pygame.transform.scale(pygame.image.load('numbers/nine.png'),(75,75))
 }
