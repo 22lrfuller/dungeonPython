@@ -1,69 +1,12 @@
 from sys import exit as endGame
 from random import randint as randNum
 from pygame.locals import *
+from variableInit import *
 import pygame
-import sys
 pygame.init()
 
 global randDoor, randBlock
 global curFrame
-
-# Board size constants
-xSize = 12
-ySize = 8
-# Maximum index for board coordinates
-xMax = xSize - 1
-yMax = ySize - 1
-# Non-Color Variables
-xBox = 0
-yBox = 0
-diamonds = 0
-animCount = 0
-curFrame = 0
-scene = 'startPage'
-playerDir = 'front'
-imageType = None
-gameOver = False
-animRun = False
-gameBoard = []
-chestPos = []
-entrancePos = []
-posPath = []
-displayWidth = xSize*100
-displayHeight = (ySize+1)*100
-randBlock = randNum(1,10)
-
-# Images
-startScreen = pygame.transform.scale(pygame.image.load('gameArt/startScreen.png'), (1000,1000))
-invBG = pygame.transform.scale(pygame.image.load('gameArt/invBG.png'), (1200,100))
-invObj = pygame.transform.scale(pygame.image.load('gameArt/invObj.png'), (75,75))
-
-charDict = {'front':pygame.transform.scale(pygame.image.load('gameArt/charFront.png'), (75, 75)),
-'back':pygame.transform.scale(pygame.image.load('gameArt/charBack.png'), (75, 75)),
-'left':pygame.transform.scale(pygame.image.load('gameArt/charLeft.png'), (75, 75)),
-'right':pygame.transform.scale(pygame.image.load('gameArt/charRight.png'), (75, 75))}
-
-path = pygame.transform.scale(pygame.image.load('gameArt/path.png'), (100,100))
-crackedPath = pygame.transform.scale(pygame.image.load('gameArt/cracked.path.png'), (100,100))
-flowerPath = pygame.transform.scale(pygame.image.load('gameArt/flower.path.png'), (100,100))
-crackedFlowerPath = pygame.transform.scale(pygame.image.load('gameArt/crackedFlower.path.png'), (100,100))
-cBlock = pygame.transform.scale(pygame.image.load('gameArt/cBlock.png'), (100,100))
-flowerCBlock = pygame.transform.scale(pygame.image.load('gameArt/flower.cBlock.png'), (100,100))
-wall = pygame.transform.scale(pygame.image.load('gameArt/wall.png'), (100,100))
-crackedWall = pygame.transform.scale(pygame.image.load('gameArt/cracked.wall.png'), (100,100))
-door = pygame.transform.scale(pygame.image.load('gameArt/door.png'), (100,100))
-flowerDoor = pygame.transform.scale(pygame.image.load('gameArt/flower.door.png'), (100,100))
-
-cBlockSS = pygame.transform.scale(pygame.image.load('gameArt/cBlockSS.png'), (100,100))
-flowerCBlockSS = pygame.transform.scale(pygame.image.load('gameArt/flower.cBlockSS.png'), (100,100))
-
-# Colors
-white = (255, 255, 255)
-grey = (125, 125, 125)
-red = (255, 0, 0)
-yellow = (255, 255, 0)
-green = (0, 210, 0)
-blue = (0, 125, 255)
 
 def getBlockType(blockX, blockY, blockKind): # Defining blocks in the grid
 	global entrancePos
@@ -161,25 +104,24 @@ def checkForward(playerDir,xBox,yBox,chestPos,animRun,diamonds):
 		animRun,diamonds = True,diamonds+1
 	return chestPos,animRun
 
-def openChestAnim(animRun,chestPos,animCount,curFrame,yOpen,xOpen):
-	print("animation running")
-	frameObj = pygame.Surface([25, 25])
-	if(animCount == 10):
-		print("this ran")
+def openChestAnim(diamonds,firstAnim,frameObj,animRun,chestPos,animCount,curFrame,yOpen,xOpen):
+	if(animCount == 3 or firstAnim == True):
 		if(gameBoard[yOpen][xOpen][1] == "cBlock"):
-			frameObj.blit(cBlockSS, (0, 25 * curFrame), (0, 0, 25, 25))
+			frameObj.blit(cBlockSS, (0, 0), (0, 100 * curFrame, 100, 100)) # XXX: Doesn't get frame correctly
 		if(gameBoard[yOpen][xOpen][1] == "flower.cBlock"):
-			frameObj.blit(flowerCBlockSS, (0, 25 * curFrame), (0, 0, 25, 25))
-		screen.blit(pygame.transform.scale(frameObj,(100,100)),(xOpen*100,yOpen*100))
+			frameObj.blit(flowerCBlockSS, (0, 0), (0, 100 * curFrame, 100, 100)) # XXX: Doesn't get frame correctly
 		curFrame += 1
 		animCount = 0
+		firstAnim = False
+	screen.blit(frameObj,(xOpen*100,yOpen*100))
 	if(curFrame == 10):
-		print("curFrame == 10")
 		gameBoard[yOpen][xOpen][0] = 'path'
 		gameBoard[yOpen][xOpen][1] = getArt('path')
-		curFrame = 0
+		diamonds += 1
 		animRun = False
-	return animCount, curFrame, animRun
+		firstAnim = True
+		curFrame = 0
+	return diamonds, firstAnim, animCount, curFrame, animRun
 
 # Creating the game board in a row-major format
 # Everything will be referenced [y][x] in the array
@@ -237,12 +179,14 @@ while(gameOver == False):
 			for x in range(len(gameBoard[y])):
 				screen.blit(pygame.transform.scale(pygame.image.load('gameArt/' + str(gameBoard[y][x][1]) + '.png'),(100,100)),(x*100, y*100))
 		screen.blit(invBG,(0,800))
-		for x in range(10): # Creating boxes in the inventory
-			if(x != 0 or x != xMax-1):
+		for x in range(9): # Creating boxes in the inventory
+			if(x == 8):
+				screen.blit(diamondPic,((x+1)*110,812))
+			if(x != 8):
 				screen.blit(invObj,((x+1)*110,812))
 		screen.blit(charDict[playerDir],(xBox*100+12, yBox*100+12))
 
-	if(animRun == True): animCount, curFrame, animRun = openChestAnim(animRun,chestPos,animCount,curFrame,chestPos[0],chestPos[1])
+	if(animRun == True): diamonds, firstAnim, animCount, curFrame, animRun = openChestAnim(diamonds,firstAnim,frameObj,animRun,chestPos,animCount,curFrame,chestPos[0],chestPos[1])
 
 	# Other
 	if(animRun == True):
