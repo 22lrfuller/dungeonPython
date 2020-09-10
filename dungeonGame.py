@@ -115,16 +115,16 @@ def checkForward(playerDir, xBox, yBox, chestPos, animRun, diamonds):
 def openChestAnim(diamonds, firstAnim, frameObj, animRun, chestPos, animCount, curFrame):
 	yOpen = chestPos[0]
 	xOpen = chestPos[1]
-	if(animCount == 3 or firstAnim == True):
-		if(gameBoard[yOpen][xOpen][1] == "cBlock"):
+	if (animCount == 3 or firstAnim == True):
+		if (gameBoard[yOpen][xOpen][1] == "cBlock"):
 			frameObj.blit(cBlockSS, (0, 0), (0, 100 * curFrame, 100, 100))
-		if(gameBoard[yOpen][xOpen][1] == "flower.cBlock"):
+		if (gameBoard[yOpen][xOpen][1] == "flower.cBlock"):
 			frameObj.blit(flowerCBlockSS, (0, 0), (0, 100 * curFrame, 100, 100))
 		curFrame += 1
 		animCount = 0
 		firstAnim = False
 	screen.blit(frameObj,(xOpen*100,yOpen*100))
-	if(curFrame == 10):
+	if (curFrame == 10):
 		gameBoard[yOpen][xOpen][0] = 'path'
 		gameBoard[yOpen][xOpen][1] = getArt('path')
 		diamonds += 1
