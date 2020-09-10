@@ -6,10 +6,6 @@ import pygame
 xSize = 12
 ySize = 8
 
-# Maximum index for board coordinates
-xMax = xSize - 1
-yMax = ySize - 1
-
 xBox = 0 # Tile x position
 yBox = 0 # Tile y position
 
@@ -28,18 +24,17 @@ chestPos = [] # Stores the position of the chest the player opens
 entrancePos = [] # Stores the entrance position
 posPath = [] # Stores the blocks in the entrance to exit path
 
-displayWidth = xSize*100 # The width of the screen
-displayHeight = (ySize+1)*100 # The height of the screen
-randBlock = randNum(1,10) # Variable used for random operations
+displayWidth = xSize * 100 # The width of the screen
+displayHeight = (ySize + 1) * 100 # The height of the screen
 frameObj = pygame.Surface([100, 100]) # Holds the size of each frame in a spritesheet
 
 # Colors in (RGB) format
-white = (255, 255, 255)
-red = (255, 0, 0)
+black = (0, 0, 0)
 blue = (0, 125, 255)
+green = (55, 215, 55)
 
 # GUI images
-startScreen = pygame.transform.scale(pygame.image.load('gameArt/startScreen.png'), (1000,1000))
+#startScreen = pygame.transform.scale(pygame.image.load('gameArt/startScreen.png'), (1000,1000)) - Uneeded
 invBG = pygame.transform.scale(pygame.image.load('gameArt/invBG.png'), (1200,100))
 invObj = pygame.transform.scale(pygame.image.load('gameArt/invObj.png'), (75,75))
 diamondPic = pygame.transform.scale(pygame.image.load('gameArt/diamond.png'), (75,75))
