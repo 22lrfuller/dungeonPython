@@ -57,11 +57,11 @@ def getDir(entrancePos): # Creating the random path
 			blockY -= 1
 		if (randomVar == 3 and gameBoard[blockY][blockX + 1][0] != 'border'): # Right
 			blockX += 1
-		while (blockY - 1 == 0 and blockX < int(round(xSize - (xSize / 4.0)))):
-			blockX += 1
-			posPath.append([blockX, blockY])
+	while (blockY - 1 == 0 and blockX < int(round(xSize - (xSize / 4.0)))):
+		blockX += 1
 		posPath.append([blockX, blockY])
-	exitPos = [blockX, blockY-1]
+		posPath.append([blockX, blockY])
+	exitPos = [blockX, blockY - 1]
 	for i in range(len(posPath)):
 		gameBoard[posPath[i][1]][posPath[i][0]] = [getBlockType(posPath[i][0],posPath[i][1],'origPath')]
 	gameBoard[exitPos[1]][exitPos[0]] = ['exit']
